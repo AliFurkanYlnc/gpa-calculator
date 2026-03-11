@@ -1,0 +1,27 @@
+# Çevresel Değişkenler ve Gizli Dosyalar
+.env
+
+# Python Sanal Ortamları
+.venv/
+venv/
+env/
+
+# Python Önbellek ve Derlenmiş Dosyalar
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Projeye Özel Klasörler (Test, Upload vb.)
+testfiles/
+uploads/
+
+# IDE ve Editör Dosyaları
+.vscode/
+
+# İşletim Sistemi Kalıntıları
+.DS_Store
+Thumbs.db
+
+# Gelecekteki Node/Tailwind Bağımlılıkları İçin
+node_modules/

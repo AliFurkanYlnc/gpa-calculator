@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="tr" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Akademik Transkript</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="tailwind.config.js" defer></script>
+  </head>
+  <body class="bg-obsidian text-slate-100 font-mono antialiased min-h-screen">
+
+    <div class="grain-overlay" aria-hidden="true"></div>
+
+    <header class="border-b border-white/10 sticky top-0 z-50 bg-obsidian/90 backdrop-blur-sm">
+      <div class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-2 h-8 bg-gold rounded-sm"></div>
+          <span class="font-display text-sm sm:text-base font-bold tracking-widest uppercase text-slate-200">
+            Akademik Kayıt
+          </span>
+        </div>
+        <!-- Reset butonu: sonuçlar gösterilince görünür -->
+        <button
+          id="btn-reset"
+          class="hidden font-mono text-xs text-slate-500 hover:text-gold border border-white/10 hover:border-gold/40 px-3 py-1.5 rounded transition-all duration-200"
+          aria-label="Yeni PDF yükle"
+        >
+          ↩ Yeni Yükle
+        </button>
+        <div id="header-label" class="font-mono text-xs text-slate-500 tracking-widest">
+          TRANSCRIPT VIEWER v1.0
+        </div>
+      </div>
+    </header>
+
+    <main class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-16">
+
+      <!-- ───────────── UPLOAD EKRANI ───────────── -->
+      <section id="upload-screen" aria-label="PDF Yükleme Alanı" class="flex flex-col items-center justify-center min-h-[60vh]">
+        <p class="font-mono text-xs text-gold tracking-widest uppercase mb-3">Başlamak için transkript yükleyin</p>
+        <h1 class="font-display text-3xl sm:text-4xl font-extrabold text-slate-100 mb-2 text-center">
+          PDF Transkriptinizi<br class="hidden sm:block"/> Analiz Edin
+        </h1>
+        <p class="text-slate-500 text-sm text-center mb-10 max-w-sm">
+          Üniversite transkriptinizi yükleyin, dönem bazlı GPA ve ders notlarınızı görselleştirin.
+        </p>
+
+        <!-- Dropzone -->
+        <div
+          id="dropzone"
+          class="relative w-full max-w-md border-2 border-dashed border-white/20 rounded-2xl p-10 flex flex-col items-center gap-4 cursor-pointer
+                 hover:border-gold/50 hover:bg-white/5 transition-all duration-300 group"
+          role="button"
+          tabindex="0"
+          aria-label="PDF dosyası yüklemek için tıklayın veya sürükleyin"
+        >
+          <!-- PDF ikon -->
+          <div class="w-16 h-16 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-gold/30 transition-all duration-300">
+            <svg class="w-8 h-8 text-slate-400 group-hover:text-gold transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m.75 12l3 3m0 0l3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+            </svg>
+          </div>
+
+          <div class="text-center">
+            <p class="text-slate-200 font-display font-semibold text-sm">Dosyayı buraya sürükleyin</p>
+            <p class="text-slate-500 text-xs mt-1">veya tıklayarak seçin · Yalnızca .pdf</p>
+          </div>
+
+          <!-- Seçilen dosya adı -->
+          <p id="file-name-display" class="text-xs text-gold font-mono hidden truncate max-w-xs"></p>
+
+          <input
+            id="pdf-input"
+            type="file"
+            accept=".pdf"
+            class="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+            aria-label="PDF dosyası seç"
+          />
+        </div>
+
+        <!-- Yükle butonu -->
+        <button
+          id="btn-upload"
+          disabled
+          class="mt-6 px-8 py-3 rounded-lg font-display font-bold text-sm tracking-widest uppercase
+                 bg-gold text-obsidian transition-all duration-200
+                 disabled:opacity-30 disabled:cursor-not-allowed
+                 hover:bg-yellow-300 active:scale-95"
+          aria-label="Transkripti analiz et"
+        >
+          Analiz Et
+        </button>
+
+        <!-- Upload hata mesajı -->
+        <p id="upload-error" class="mt-4 text-xs text-grade-fail font-mono hidden" role="alert"></p>
+      </section>
+
+      <!-- ───────────── YÜKLENIYOR EKRANI ───────────── -->
+      <section
+        id="loading-screen"
+        class="hidden flex-col items-center justify-center min-h-[60vh] gap-6"
+        aria-live="polite"
+        aria-label="Yükleniyor"
+      >
+        <!-- Animasyonlu spinner -->
+        <div class="relative w-20 h-20" aria-hidden="true">
+          <div class="absolute inset-0 rounded-full border-2 border-white/10"></div>
+          <div class="absolute inset-0 rounded-full border-2 border-t-gold border-r-transparent border-b-transparent border-l-transparent animate-spin"></div>
+          <div class="absolute inset-3 rounded-full border border-t-gold/40 border-r-transparent border-b-transparent border-l-transparent animate-spin" style="animation-duration: 1.5s; animation-direction: reverse;"></div>
+        </div>
+        <div class="text-center">
+          <p class="font-display font-bold text-slate-100 text-lg">Transkript Analiz Ediliyor</p>
+          <p id="loading-step" class="font-mono text-xs text-slate-500 mt-2 tracking-wider">PDF işleniyor...</p>
+        </div>
+        <!-- Animasyonlu satırlar (sahte progress) -->
+        <div class="w-full max-w-sm space-y-2 mt-2" aria-hidden="true">
+          <div class="h-1.5 bg-white/5 rounded-full overflow-hidden"><div class="h-full bg-gold/60 rounded-full loading-bar" style="animation-delay: 0s;"></div></div>
+          <div class="h-1.5 bg-white/5 rounded-full overflow-hidden"><div class="h-full bg-gold/40 rounded-full loading-bar" style="animation-delay: 0.2s;"></div></div>
+          <div class="h-1.5 bg-white/5 rounded-full overflow-hidden"><div class="h-full bg-gold/20 rounded-full loading-bar" style="animation-delay: 0.4s;"></div></div>
+        </div>
+      </section>
+
+      <!-- ───────────── SONUÇ EKRANI ───────────── -->
+      <section id="result-screen" class="hidden" aria-label="Transkript Sonuçları">
+
+        <!-- Öğrenci Bilgileri -->
+        <div id="student-info" class="mb-12 rounded-xl border border-white/10 bg-white/5 p-6 md:p-8 relative overflow-hidden">
+          <div class="absolute inset-0 bg-gradient-to-br from-gold/5 to-transparent pointer-events-none"></div>
+          <p class="text-xs font-mono text-gold tracking-widest uppercase mb-3">Öğrenci Bilgileri</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div>
+              <p class="text-xs text-slate-500 uppercase tracking-wider mb-1">Ad Soyad / Program</p>
+              <p id="student-name" class="font-display text-slate-100 text-sm font-semibold leading-snug"></p>
+            </div>
+            <div>
+              <p class="text-xs text-slate-500 uppercase tracking-wider mb-1">Öğrenci No</p>
+              <p id="student-no" class="font-mono text-gold text-lg font-bold tracking-widest"></p>
+            </div>
+            <div>
+              <p class="text-xs text-slate-500 uppercase tracking-wider mb-1">Genel GPA</p>
+              <p id="genel-gpa" class="font-display text-4xl font-extrabold"></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- GPA Zaman Çizelgesi -->
+        <div class="mb-12">
+          <h2 class="font-display text-xs tracking-widest uppercase text-slate-500 mb-4">GPA Zaman Çizelgesi</h2>
+          <div id="gpa-timeline" class="flex items-end gap-2 overflow-x-auto pb-3" role="img" aria-label="Dönem bazlı GPA çubuk grafiği"></div>
+        </div>
+
+        <!-- Legend -->
+        <div class="flex flex-wrap gap-4 mb-8 text-xs font-mono" aria-label="Harf notu renk açıklaması">
+          <span class="flex items-center gap-2"><span class="inline-block w-3 h-3 rounded-sm bg-grade-pass"></span>Geçer (AA–CC)</span>
+          <span class="flex items-center gap-2"><span class="inline-block w-3 h-3 rounded-sm bg-grade-marginal"></span>Koşullu (DC–DD)</span>
+          <span class="flex items-center gap-2"><span class="inline-block w-3 h-3 rounded-sm bg-grade-fail"></span>Başarısız (F)</span>
+          <span class="flex items-center gap-2"><span class="inline-block w-3 h-3 rounded-sm bg-grade-pending"></span>Beklemede (R/ME)</span>
+          <span class="flex items-center gap-2"><span class="inline-block w-3 h-3 rounded-sm bg-grade-repeat"></span>Tekrar</span>
+        </div>
+
+        <!-- Dönem Kartları -->
+        <div id="semester-list" class="space-y-6"></div>
+      </section>
+
+      <!-- API hata mesajı (global) -->
+      <div id="error-msg" class="hidden text-center py-20" role="alert">
+        <p class="text-grade-fail font-mono text-sm mb-2">⚠ Bir hata oluştu</p>
+        <p id="error-detail" class="text-slate-500 text-xs"></p>
+      </div>
+
+    </main>
+
+    <footer class="border-t border-white/10 mt-16 py-6 text-center text-xs text-slate-600 font-mono tracking-widest">
+      AKADEMİK TRANSKRİPT — GİZLİ BELGE
+    </footer>
+
+    <script src="app.js" type="module"></script>
+  </body>
+</html>
