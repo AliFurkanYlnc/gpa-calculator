@@ -13,3 +13,14 @@ body > * {
   position: relative;
   z-index: 1;
 }
+
+@keyframes loading-sweep {
+  0%   { width: 0%;   opacity: 1; }
+  60%  { width: 85%;  opacity: 1; }
+  90%  { width: 95%;  opacity: 0.6; }
+  100% { width: 100%; opacity: 0; }
+}
+
+.loading-bar {
+  animation: loading-sweep 2.4s ease-in-out infinite;
+}

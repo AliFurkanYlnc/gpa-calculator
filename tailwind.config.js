@@ -1,4 +1,5 @@
 tailwind.config = {
+  DarkMode: "class",
   theme: {
     extend: {
       colors: {

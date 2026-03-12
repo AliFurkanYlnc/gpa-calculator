@@ -16,6 +16,9 @@ __pycache__/
 testfiles/
 uploads/
 
+# Projeye Özel Dosyalar (Test vb.)
+test.py
+
 # IDE ve Editör Dosyaları
 .vscode/
 
