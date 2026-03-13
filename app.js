@@ -1,5 +1,5 @@
 // ─── Sabitler ──────────────────────────────────────────────────────────────
-const API_URL = "http://127.0.0.1:5000/api/v1/parse";
+const API_URL = "https://gpa-calculator-bitj.onrender.com/api/v1/parse";
 
 const GRADE_META = {
   AA: { color: "bg-grade-pass"     },
